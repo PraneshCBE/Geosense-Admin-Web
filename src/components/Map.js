@@ -3,6 +3,7 @@ import redbull from "../assets/images/stud.png";
 import fbapp from "../firebase";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useEffect, useState } from "react";
+import './Map.css';
 // import axios from "axios";
 
 // const master = {
@@ -136,20 +137,24 @@ const Map = (props) => {
   return (
     isLoaded && (
       <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-  <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', border: '1px solid #ccc', padding: '5px', borderRadius: '5px' }}>
-    <label htmlFor="latitude" style={{ marginRight: '10px' }}>Latitude:</label>
-    <input type="text" id="latitude" value={master.lat} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '3px', fontSize: '14px' }} />
+      <div className="input-container">
+  <div>
+    <div>
+      <label htmlFor="latitude">Latitude:</label>
+      <input type="text" id="latitude" value={master.lat} />
+    </div>
+    <div>
+      <label htmlFor="longitude">Longitude:</label>
+      <input type="text" id="longitude" value={master.lng} />
+    </div>
   </div>
-  <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', border: '1px solid #ccc', padding: '5px', borderRadius: '5px' }}>
-    <label htmlFor="longitude" style={{ marginRight: '10px' }}>Longitude:</label>
-    <input type="text" id="longitude" value={ master.lng } style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '3px', fontSize: '14px' }} />
+  <div>
+    <div>
+      <label htmlFor="radius">Radius:</label>
+      <input type="number" id="radius" value={RADIUS} />
+    </div>
+    <button onClick={handleMasterChange}>Set Class Location</button>
   </div>
-  <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', border: '1px solid #ccc', padding: '5px', borderRadius: '5px' }}>
-    <label htmlFor="radius" style={{ marginRight: '10px' }}>Radius:</label>
-    <input type="number" id="radius" value={RADIUS} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '3px', fontSize: '14px' }} />
-  </div>
-  <button onClick={handleMasterChange} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '3px', fontSize: '14px', backgroundColor: '#007bff', color: 'white', cursor: 'pointer', transition: 'background-color 0.3s ease' }}>Set Class Location</button>
 </div>
 
 
