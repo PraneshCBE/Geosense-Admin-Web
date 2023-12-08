@@ -44,6 +44,18 @@
     background-color: #0056b3;
   }
   
+  #tokenValue {
+    /* Set your desired styles for compressed view */
+    display: inline-block;
+    max-width: 100px; /* Adjust this to your desired width */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .colored-toast.swal2-icon-success {
+    background-color: #a5dc86 !important;
+  }  
   /* Media query for smaller screens */
   @media (max-width: 600px) {
     .input-container > div {

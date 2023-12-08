@@ -3,14 +3,14 @@ import redbull from "../assets/images/stud.png";
 import fbapp from "../firebase";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useEffect, useState } from "react";
-import './Map.css';
+import "./Map.css";
+import Swal from 'sweetalert2'
 // import axios from "axios";
 
 // const master = {
 //   lat: 10.9064173,
 //   lng: 76.8973394,
 // };
-
 
 //var RADIUS = 100; //in meters
 
@@ -32,16 +32,12 @@ const Map = (props) => {
 
   const database = getDatabase(fbapp);
 
-
   const handleMasterChange = () => {
     const lat = parseFloat(document.getElementById("latitude").value);
     const lng = parseFloat(document.getElementById("longitude").value);
     setMaster({ lat, lng });
     setRADIUS(parseFloat(document.getElementById("radius").value));
   };
-
-    
-
 
   useEffect(() => {
     const usersRef = ref(database, "Users");
@@ -70,6 +66,7 @@ const Map = (props) => {
             lat: parseFloat(user.loc.split(",")[0]), // Extracting lat from loc
             lng: parseFloat(user.loc.split(",")[1]), // Extracting lng from loc
           },
+          token: user.fcmToken,
         }));
 
         setMarkers(transformedData);
@@ -111,87 +108,102 @@ const Map = (props) => {
     const distance = R * c;
     return distance; // Distance in meters
   }
-//   async function sendMessageToUser(token, title, body) {
-//     //add code to send message to token
-//     //api call to send message through https://fcm.googleapis.com/fcm/send
-//     const response=await axios.post(
-//       "https://fcm.googleapis.com/fcm/send",
-//       {
-//         to: token,
-//         notification: {
-//           title: title,
-//           body: body,
-//         },
-//       },
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           "Authorization":"key=BEG28Eq9timrTUcU28VEiMmxvs1-FP2pk_ZAjCBhB5oEBbxgRO-dIaNwTvB4Su_l4mgv0VHVkWN7BsSO1x1V47Y"
-//           // Add any other headers if needed
-//         },
-//       }
-//     );
-//     console.log(response);
-//   }
+ 
+  function copyToken() {
+    const tokenElement = document.getElementById('tokenValue');
+    const fullText = tokenElement.innerText;
+
+    // Create a temporary textarea to copy the full text
+    const tempInput = document.createElement('textarea');
+    tempInput.value = fullText;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'center',
+      iconColor: 'white',
+      customClass: {
+        popup: 'colored-toast',
+      },
+      showConfirmButton: false,
+      timer: 1000,
+      timerProgressBar: true,
+    });
+    (async () => {
+      await Toast.fire({
+        icon: 'success',
+        title: 'Copied to Clipboard',
+      })
+    })();
+}
+
 
   return (
     isLoaded && (
       <div>
-      <div className="input-container">
-  <div>
-    <div>
-      <label htmlFor="latitude">Latitude:</label>
-      <input type="text" id="latitude" value={master.lat} />
-    </div>
-    <div>
-      <label htmlFor="longitude">Longitude:</label>
-      <input type="text" id="longitude" value={master.lng} />
-    </div>
-  </div>
-  <div>
-    <div>
-      <label htmlFor="radius">Radius:</label>
-      <input type="number" id="radius" value={RADIUS} />
-    </div>
-    <button onClick={handleMasterChange}>Set Class Location</button>
-  </div>
-</div>
-
+        <div className="input-container">
+          <div>
+            <div>
+              <label htmlFor="latitude">Latitude:</label>
+              <input type="text" id="latitude" value={master.lat} />
+            </div>
+            <div>
+              <label htmlFor="longitude">Longitude:</label>
+              <input type="text" id="longitude" value={master.lng} />
+            </div>
+          </div>
+          <div>
+            <div>
+              <label htmlFor="radius">Radius:</label>
+              <input type="number" id="radius" value={RADIUS} />
+            </div>
+            <button onClick={handleMasterChange}>Set Class Location</button>
+          </div>
+        </div>
 
         <GoogleMap mapContainerStyle={containerStyle} center={master} zoom={16}>
-        <Circle
-          center={master}
-          radius={RADIUS}
-          options={{
-            strokeColor: "#FF0000",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: "#FF0000",
-            fillOpacity: 0.05,
-          }}
-        />
-        {markers.map((marker) => {
-          return (
-            <div key={marker.name}>
-              <Marker
-                position={marker.location}
-                onClick={() => handleMarkerClick(marker)}
-                icon={{
-                  url: redbull,
-                  scaledSize: new window.google.maps.Size(50, 50),
-                }}
-              />
-              {selectedMarker === marker && (
-                <InfoWindow
-                  onCloseClick={handleCloseClick}
+          <Circle
+            center={master}
+            radius={RADIUS}
+            options={{
+              strokeColor: "#FF0000",
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: "#FF0000",
+              fillOpacity: 0.05,
+            }}
+          />
+          {markers.map((marker) => {
+            return (
+              <div key={marker.name}>
+                <Marker
                   position={marker.location}
-                >
-                  <div>
-                    <div>👨‍💻{marker.name}</div>
+                  onClick={() => handleMarkerClick(marker)}
+                  icon={{
+                    url: redbull,
+                    scaledSize: new window.google.maps.Size(50, 50),
+                  }}
+                />
+                {selectedMarker === marker && (
+                  <InfoWindow
+                    onCloseClick={handleCloseClick}
+                    position={marker.location}
+                  >
                     <div>
-                      📍{marker.location.lat},{marker.location.lng}
-                    </div>
-                    {/* <button
+                      <div>👨‍💻{marker.name}</div>
+                      <div>
+                        📍{marker.location.lat},{marker.location.lng}
+                      </div>
+                      <div>
+                        🪙<span id="tokenValue">{marker.token}</span>
+                        <button onClick={copyToken}>
+                          📋
+                        </button>
+                      </div>
+                      {/* <button
                       onClick={() =>
                         sendMessageToUser(
                           marker.token,
@@ -202,28 +214,30 @@ const Map = (props) => {
                     >
                       Send Alert
                     </button> */}
-                  </div>
-                </InfoWindow>
-              )}
-              <Marker position={master} onClick={handleMasterMarkerClick} />
-            </div>
-          );
-        })}
-        {showMarkersInsideCircle && (
-          <InfoWindow
-            onCloseClick={() => setShowMarkersInsideCircle(false)}
-            position={master}
-          >
-            <div>
-              <div>Total Students: {markers.length}</div>
-              <div>No.of Students(s) inside: {markersInsideCircle.length}</div>
-              {markersInsideCircle.map((marker) => (
-                <div key={marker.name}>😀 {marker.name}</div>
-              ))}
-            </div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
+                    </div>
+                  </InfoWindow>
+                )}
+                <Marker position={master} onClick={handleMasterMarkerClick} />
+              </div>
+            );
+          })}
+          {showMarkersInsideCircle && (
+            <InfoWindow
+              onCloseClick={() => setShowMarkersInsideCircle(false)}
+              position={master}
+            >
+              <div>
+                <div>Total Students: {markers.length}</div>
+                <div>
+                  No.of Students(s) inside: {markersInsideCircle.length}
+                </div>
+                {markersInsideCircle.map((marker) => (
+                  <div key={marker.name}>😀 {marker.name}</div>
+                ))}
+              </div>
+            </InfoWindow>
+          )}
+        </GoogleMap>
       </div>
     )
   );
